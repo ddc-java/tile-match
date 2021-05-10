@@ -32,11 +32,13 @@ public class TileAdapter extends ArrayAdapter<Tile> {
         : AdapterTileBinding.inflate(inflater, parent, false);
     Tile tile = getItem(position);
     if (tile.getState() == State.HIDDEN) {
-      binding.number.setText(String.valueOf(position) + 1);
+      binding.number.setText(String.valueOf(position + 1));
+      binding.number.setVisibility(View.VISIBLE);
       binding.image.setVisibility(View.GONE);
     } else {
       binding.image.setImageResource(TileImages.RESOURCE_IDS.get(tile.getImageIndex()));
       binding.number.setVisibility(View.GONE);
+      binding.image.setVisibility(View.VISIBLE);
     }
     return binding.getRoot();
   }

@@ -40,20 +40,20 @@
   </string-array>
 
   <string-array name="size_preference_values">
-    <item>12</item>
+    <item>10</item>
     <item>18</item>
     <item>28</item>
     <item>40</item>
   </string-array>
 
-  <string name="size_preference_default">12</string>
+  <string name="size_preference_default">10</string>
   <string name="size_preference_title">Experience level</string>
   <string name="size_preference_summary">%s</string>
 
   <string name="reveal_time_preference_key">reveal_time_preference</string>
   <string name="reveal_time_preference_title">Time revealed</string>
-  <string name="reveal_time_preference_summary_pattern">Wait %d seconds before hiding unsuccessfuly matched tiles.</string>
+  <string name="reveal_time_preference_summary_pattern">Wait %d seconds before hiding unmatched tiles.</string>
   <string name="puzzle_setup_title">New puzzle settings</string>
-  <string name="play_setup_title">Displat settings</string>
+  <string name="play_setup_title">Display settings</string>
 
 </resources>

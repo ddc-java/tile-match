@@ -51,6 +51,7 @@ public class PuzzleViewModel extends AndroidViewModel implements LifecycleObserv
   private int revealTimePreference;
   private CountDownTimer revealCountdown;
   private Timer durationCountup;
+  private long countupStart;
 
   public PuzzleViewModel(@NonNull Application application) {
     super(application);
@@ -104,6 +105,15 @@ public class PuzzleViewModel extends AndroidViewModel implements LifecycleObserv
   public void newPuzzle() {
     Puzzle puzzle = puzzleRepository.createPuzzle();
     this.puzzle.setValue(puzzle);
+    durationCountup = new Timer();
+    countupStart = System.currentTimeMillis();
+    durationCountup.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        long now = System.currentTimeMillis();
+        duration.postValue(now - countupStart);
+      }
+    }, 200, 200);
   }
 
   public void select(int position) {

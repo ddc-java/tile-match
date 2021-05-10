@@ -5,6 +5,11 @@
   tools:ignore="AlwaysShowAction">
 
   <item
+    android:id="@+id/timer"
+    app:actionLayout="@layout/item_main_options"
+    app:showAsAction="always"/>
+
+  <item
     android:id="@+id/new_puzzle"
     android:title="@string/new_puzzle"
     android:icon="@drawable/ic_refresh"

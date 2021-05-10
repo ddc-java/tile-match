@@ -23,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -36,8 +37,12 @@ import java.util.List;
 
 public class PuzzleFragment extends Fragment {
 
+  public static final int SECONDS_PER_MINUTE = 60;
+  public static final int MINUTES_PER_HOUR = 60;
+  public static final int MS_PER_SECOND = 1000;
   private FragmentPuzzleBinding binding;
   private PuzzleViewModel viewModel;
+  private TextView timer;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,11 +79,26 @@ public class PuzzleFragment extends Fragment {
 //        binding.board.setSelection(selections.get(selections.size() - 1));
       }
     });
+    viewModel.getDuration().observe(getViewLifecycleOwner(), (ms) -> {
+      int seconds = (int) Math.round((double) ms / MS_PER_SECOND);
+      int minutes = seconds / SECONDS_PER_MINUTE;
+      seconds %= SECONDS_PER_MINUTE;
+      int hours = minutes / MINUTES_PER_HOUR;
+      minutes %= MINUTES_PER_HOUR;
+      String elapsedTime;
+      if (hours > 0) {
+        elapsedTime = String.format("%d:%02d:%02d", hours, minutes, seconds);
+      } else {
+        elapsedTime = String.format("%02d:%02d", minutes, seconds);
+      }
+      timer.setText(elapsedTime);
+    });
   }
 
   @Override
   public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
     inflater.inflate(R.menu.puzzle_options, menu);
+    timer = (TextView) menu.findItem(R.id.timer).getActionView();
   }
 
   @Override
