@@ -1,46 +1,50 @@
-package edu.cnm.deepdive.tilematch.adapter;
+package edu.cnm.deepdive.tilematch.adapter
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import edu.cnm.deepdive.tilematch.R;
-import edu.cnm.deepdive.tilematch.databinding.AdapterTileBinding;
-import edu.cnm.deepdive.tilematch.model.Puzzle;
-import edu.cnm.deepdive.tilematch.model.Tile;
-import edu.cnm.deepdive.tilematch.model.Tile.State;
-import edu.cnm.deepdive.tilematch.view.TileImages;
-import java.util.List;
+import android.content.Context
+import edu.cnm.deepdive.tilematch.model.Puzzle
+import android.widget.ArrayAdapter
+import edu.cnm.deepdive.tilematch.R
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import edu.cnm.deepdive.tilematch.databinding.AdapterTileBinding
+import edu.cnm.deepdive.tilematch.model.Tile
+import edu.cnm.deepdive.tilematch.view.TileImages
 
-public class TileAdapter extends ArrayAdapter<Tile> {
+class TileAdapter(context: Context, puzzle: Puzzle) :
+    ArrayAdapter<Tile?>(context, R.layout.adapter_tile, puzzle.tiles) {
 
-  private final LayoutInflater inflater;
+    private val inflater: LayoutInflater
 
-  public TileAdapter(@NonNull Context context, @NonNull Puzzle puzzle) {
-    super(context, R.layout.adapter_tile, puzzle.getTiles());
-    inflater = LayoutInflater.from(context);
-  }
-
-  @NonNull
-  @Override
-  public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-    AdapterTileBinding binding = (convertView != null)
-        ? AdapterTileBinding.bind(convertView)
-        : AdapterTileBinding.inflate(inflater, parent, false);
-    Tile tile = getItem(position);
-    if (tile.getState() == State.HIDDEN) {
-      binding.number.setText(String.valueOf(position + 1));
-      binding.number.setVisibility(View.VISIBLE);
-      binding.image.setVisibility(View.GONE);
-    } else {
-      binding.image.setImageResource(TileImages.RESOURCE_IDS.get(tile.getImageIndex()));
-      binding.number.setVisibility(View.GONE);
-      binding.image.setVisibility(View.VISIBLE);
+    init {
+        inflater = LayoutInflater.from(context)
     }
-    return binding.getRoot();
-  }
+
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        (if (convertView != null)
+            AdapterTileBinding.bind(convertView)
+        else
+            AdapterTileBinding.inflate(inflater, parent, false)).apply {
+            val tile = getItem(position)!!
+            number.text = (position + 1).toString()
+            image.setImageResource(TileImages.RESOURCE_IDS[tile.imageIndex])
+            when (tile.state) {
+                Tile.State.HIDDEN -> {
+                    number.visibility = View.VISIBLE
+                    image.visibility = View.GONE
+                }
+                Tile.State.SELECTED -> {
+                    number.visibility = View.GONE
+                    image.visibility = View.VISIBLE
+                }
+                Tile.State.SOLVED -> {
+                    number.visibility = View.GONE
+                    image.visibility = View.VISIBLE
+                    image.alpha = 0.25f
+                }
+            }
+            return this.root;
+        }
+    }
 
 }

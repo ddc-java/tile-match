@@ -17,11 +17,12 @@ public class Tile {
     return imageIndex;
   }
 
+  @NonNull
   public State getState() {
     return state;
   }
 
-  public void setState(State state) {
+  public void setState(@NonNull State state) {
     this.state = state;
   }
 
