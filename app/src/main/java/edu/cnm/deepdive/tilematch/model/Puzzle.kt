@@ -1,111 +1,102 @@
-package edu.cnm.deepdive.tilematch.model;
+package edu.cnm.deepdive.tilematch.model
 
-import androidx.annotation.NonNull;
-import edu.cnm.deepdive.tilematch.model.Tile.State;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.*
+import java.util.function.Consumer
+import java.util.function.Supplier
+import java.util.stream.Collectors
+import java.util.stream.IntStream
+import java.util.stream.Stream
+import kotlin.collections.ArrayList
 
-public class Puzzle {
+class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
 
-  private final int size;
-  @NonNull
-  private final List<Tile> tiles;
-  @NonNull
-  private final List<Integer> selections;
+    val tiles: List<Tile>
 
-  @NonNull
-  private State state;
-  private int matches;
-  private int moves;
-  private Tile selection;
+    var state: State
+        private set
 
-  public Puzzle(int puzzleSize, int imagePoolSize, Random rng) {
-    size = puzzleSize;
-    List<Integer> pool = IntStream
-        .range(0, imagePoolSize)
-        .boxed()
-        .collect(Collectors.toCollection(ArrayList::new));
-    Collections.shuffle(pool, rng);
-    List<Tile> rawTiles = pool
-        .stream()
-        .limit(puzzleSize / 2)
-        .flatMap((v) -> Stream.of(new Tile(v), new Tile(v)))
-        .collect(Collectors.toCollection(ArrayList::new));
-    Collections.shuffle(rawTiles);
-    tiles = Collections.unmodifiableList(rawTiles);
-    selections = new LinkedList<>();
-    state = State.IN_PROGRESS;
-  }
+    var moves = 0
+        private set
 
-  public void select(int position) {
-    Tile tile = tiles.get(position);
-    selections.add(position);
-    if (tile.getState() == Tile.State.HIDDEN) {
-      switch (state) {
-        case IN_PROGRESS:
-          state = State.GUESSING;
-          tile.setState(Tile.State.SELECTED);
-          selection = tile;
-          break;
-        case GUESSING:
-          moves++;
-          if (tile.getImageIndex() == selection.getImageIndex()) {
-            matches++;
-            state = State.REVEALING_MATCH;
-            selection.setState(Tile.State.SOLVED);
-            tile.setState(Tile.State.SOLVED);
-          } else {
-            state = State.REVEALING_NO_MATCH;
-            tile.setState(Tile.State.SELECTED);
-          }
-          selection = null;
-          break;
-      }
+    private var selection: Tile? = null
+    private var matches = 0
+    private val selections: MutableList<Int>
+
+    init {
+        val pool: MutableList<Int> = IntStream
+            .range(0, imagePoolSize)
+            .boxed()
+            .collect(
+                Collectors.toCollection(
+                    Supplier { ArrayList() })
+            )
+        pool.shuffle(rng)
+        val rawTiles: MutableList<Tile> = pool
+            .stream()
+            .limit((size / 2).toLong())
+            .flatMap {
+                Stream.of(
+                    Tile(it), Tile(it)
+                )
+            }
+            .collect(Collectors.toCollection { ArrayList() })
+        rawTiles.shuffle(rng)
+        tiles = Collections.unmodifiableList(rawTiles)
+        selections = LinkedList()
+        state = State.IN_PROGRESS
     }
-  }
 
-  public void unreveal() {
-    state = (matches >= size / 2) ? State.COMPLETED : State.IN_PROGRESS;
-    tiles.forEach((tile) -> {
-      if (tile.getState() == Tile.State.SELECTED) {
-        tile.setState(Tile.State.HIDDEN);
-      }
-    });
-  }
+    fun select(position: Int) {
+        val tile = tiles[position]
+        selections.add(position)
+        if (tile.state === Tile.State.HIDDEN) {
+            when (state) {
+                State.IN_PROGRESS -> {
+                    state = State.GUESSING
+                    tile.state = Tile.State.SELECTED
+                    selection = tile
+                }
+                State.GUESSING -> {
+                    moves++
+                    state = State.REVEALING_NO_MATCH
+                    tile.state = Tile.State.SELECTED
+                    selection?.let {
+                        if (tile.imageIndex == it.imageIndex) {
+                            matches++
+                            state = if (matches >= size / 2)
+                                State.COMPLETED
+                            else
+                                State.IN_PROGRESS
+                            it.state = Tile.State.SOLVED
+                            tile.state = Tile.State.SOLVED
+                        }
+                    }
+                    selection = null
+                }
+                else -> {}
+            }
+        }
+    }
 
-  public int getSize() {
-    return size;
-  }
+    fun unreveal() {
+        if (state == State.REVEALING_NO_MATCH) {
+            tiles
+                .filter {
+                    it.state === Tile.State.SELECTED
+                }
+                .forEach(Consumer {
+                    it.state = Tile.State.HIDDEN
+                })
+            state = State.IN_PROGRESS
+        }
+    }
 
-  @NonNull
-  public List<Tile> getTiles() {
-    return tiles;
-  }
+    fun getSelections(): List<Int> {
+        return selections
+    }
 
-  @NonNull
-  public List<Integer> getSelections() {
-    return selections;
-  }
-
-  @NonNull
-  public State getState() {
-    return state;
-  }
-
-  public int getMoves() {
-    return moves;
-  }
-
-  public enum State {
-    IN_PROGRESS, GUESSING, REVEALING_NO_MATCH, REVEALING_MATCH, COMPLETED;
-  }
+    enum class State {
+        IN_PROGRESS, GUESSING, REVEALING_NO_MATCH, COMPLETED
+    }
 
 }

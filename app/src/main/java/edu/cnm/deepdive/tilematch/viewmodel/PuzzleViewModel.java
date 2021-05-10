@@ -120,7 +120,7 @@ public class PuzzleViewModel extends AndroidViewModel implements LifecycleObserv
     Puzzle puzzle = this.puzzle.getValue();
     puzzle.select(position);
     State state = puzzle.getState();
-    if (state == State.REVEALING_MATCH || state == State.REVEALING_NO_MATCH) {
+    if (state == State.REVEALING_NO_MATCH) {
       revealCountdown = new CountDownTimer(1000L * revealTimePreference, TIMER_TICK) {
         @Override
         public void onTick(long millisUntilFinished) {

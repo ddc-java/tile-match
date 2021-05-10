@@ -21,10 +21,10 @@ class TileAdapter(context: Context, puzzle: Puzzle) :
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        (if (convertView != null)
+        with(if (convertView != null)
             AdapterTileBinding.bind(convertView)
         else
-            AdapterTileBinding.inflate(inflater, parent, false)).apply {
+            AdapterTileBinding.inflate(inflater, parent, false)) {
             val tile = getItem(position)!!
             number.text = (position + 1).toString()
             image.setImageResource(TileImages.RESOURCE_IDS[tile.imageIndex])
@@ -43,7 +43,7 @@ class TileAdapter(context: Context, puzzle: Puzzle) :
                     image.alpha = 0.25f
                 }
             }
-            return this.root;
+            return root
         }
     }
 
