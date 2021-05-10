@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2021 CNM Ingenuity, Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0>
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<resources>
+
+  <string name="app_name">Tile Match</string>
+  <string name="settings">Settings</string>
+
+  <string name="new_puzzle">New puzzle</string>
+  <string name="pause_puzzle">Pause</string>
+  <string name="resume_puzzle">Resume</string>
+
+  <string name="settings_activity_label">Tile Match Settings</string>
+
+  <string-array name="tab_names">
+    <item>Play</item>
+    <item>High Scores</item>
+  </string-array>
+
+  <string name="size_preference_key">size_preference</string>
+
+  <string-array name="size_preference_labels">
+    <item>Introduction (10 tiles)</item>
+    <item>Beginner (18 tiles)</item>
+    <item>Intermediate (28 tiles)</item>
+    <item>Advanced (40 tiles)</item>
+  </string-array>
+
+  <string-array name="size_preference_values">
+    <item>12</item>
+    <item>18</item>
+    <item>28</item>
+    <item>40</item>
+  </string-array>
+
+  <string name="size_preference_default">12</string>
+  <string name="size_preference_title">Experience level</string>
+  <string name="size_preference_summary">%s</string>
+
+  <string name="reveal_time_preference_key">reveal_time_preference</string>
+  <string name="reveal_time_preference_title">Time revealed</string>
+  <string name="reveal_time_preference_summary_pattern">Wait %d seconds before hiding unsuccessfuly matched tiles.</string>
+  <string name="puzzle_setup_title">New puzzle settings</string>
+  <string name="play_setup_title">Displat settings</string>
+
+</resources>
