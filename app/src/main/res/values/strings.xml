@@ -55,5 +55,7 @@
   <string name="reveal_time_preference_summary_pattern">Wait %d seconds before hiding unmatched tiles.</string>
   <string name="puzzle_setup_title">New puzzle settings</string>
   <string name="play_setup_title">Display settings</string>
+  <string name="hms_format">%d:%02d:%02d</string>
+  <string name="ms_format">%02d:%02d</string>
 
 </resources>

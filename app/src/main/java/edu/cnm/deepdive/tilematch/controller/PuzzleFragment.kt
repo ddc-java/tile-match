@@ -13,104 +13,99 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package edu.cnm.deepdive.tilematch.controller;
+package edu.cnm.deepdive.tilematch.controller
 
-import android.content.res.Configuration;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProvider;
-import edu.cnm.deepdive.tilematch.R;
-import edu.cnm.deepdive.tilematch.adapter.TileAdapter;
-import edu.cnm.deepdive.tilematch.databinding.FragmentPuzzleBinding;
-import edu.cnm.deepdive.tilematch.viewmodel.PuzzleViewModel;
-import java.util.List;
+import android.content.res.Configuration
+import android.os.Bundle
+import android.view.*
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import edu.cnm.deepdive.tilematch.R
+import edu.cnm.deepdive.tilematch.adapter.TileAdapter
+import edu.cnm.deepdive.tilematch.databinding.FragmentPuzzleBinding
+import edu.cnm.deepdive.tilematch.viewmodel.PuzzleViewModel
+import kotlin.math.round
 
-public class PuzzleFragment extends Fragment {
+class PuzzleFragment : Fragment() {
 
-  public static final int SECONDS_PER_MINUTE = 60;
-  public static final int MINUTES_PER_HOUR = 60;
-  public static final int MS_PER_SECOND = 1000;
-  private FragmentPuzzleBinding binding;
-  private PuzzleViewModel viewModel;
-  private TextView timer;
+    private lateinit var binding: FragmentPuzzleBinding
+    private lateinit var viewModel: PuzzleViewModel
+    private lateinit var timer: TextView
+    private lateinit var hmsFormat: String
+    private lateinit var msFormat: String
 
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setHasOptionsMenu(true);
-  }
-
-  @Nullable
-  @Override
-  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    binding = FragmentPuzzleBinding.inflate(inflater, container, false);
-    binding.board.setOnItemClickListener(
-        (parent, view, position, id) -> viewModel.select(position));
-    return binding.getRoot();
-  }
-
-  @Override
-  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-    super.onViewCreated(view, savedInstanceState);
-    FragmentActivity activity = getActivity();
-    //noinspection ConstantConditions
-    viewModel = new ViewModelProvider(activity).get(PuzzleViewModel.class);
-    viewModel.getPuzzle().observe(getViewLifecycleOwner(), (puzzle) -> {
-      int columns =
-          (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
-              ? (int) Math.round(Math.sqrt(9 + 4 * puzzle.getSize()) + 3) / 2
-              : (int) Math.round(Math.sqrt(9 + 4 * puzzle.getSize()) - 3) / 2;
-      TileAdapter adapter = new TileAdapter(activity, puzzle);
-      binding.board.setNumColumns(columns);
-      binding.board.setAdapter(adapter);
-      List<Integer> selections = puzzle.getSelections();
-      if (selections.size() > 0) {
-//        binding.board.setSelection(selections.get(selections.size() - 1));
-      }
-    });
-    viewModel.getDuration().observe(getViewLifecycleOwner(), (ms) -> {
-      int seconds = (int) Math.round((double) ms / MS_PER_SECOND);
-      int minutes = seconds / SECONDS_PER_MINUTE;
-      seconds %= SECONDS_PER_MINUTE;
-      int hours = minutes / MINUTES_PER_HOUR;
-      minutes %= MINUTES_PER_HOUR;
-      String elapsedTime;
-      if (hours > 0) {
-        elapsedTime = String.format("%d:%02d:%02d", hours, minutes, seconds);
-      } else {
-        elapsedTime = String.format("%02d:%02d", minutes, seconds);
-      }
-      timer.setText(elapsedTime);
-    });
-  }
-
-  @Override
-  public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-    inflater.inflate(R.menu.puzzle_options, menu);
-    timer = (TextView) menu.findItem(R.id.timer).getActionView();
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-    boolean handled = true;
-    int id = item.getItemId();
-    if (id == R.id.new_puzzle) {
-      viewModel.newPuzzle();
-    } else {
-      handled = super.onOptionsItemSelected(item);
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        hmsFormat = getString(R.string.hms_format)
+        msFormat = getString(R.string.ms_format)
     }
-    return handled;
-  }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FragmentPuzzleBinding.inflate(inflater, container, false)
+        binding.board.onItemClickListener =
+            OnItemClickListener { parent: AdapterView<*>?, view: View?, position: Int, id: Long ->
+                viewModel.select(position)
+            }
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val activity = activity!!
+        viewModel = ViewModelProvider(activity)
+            .get(PuzzleViewModel::class.java)
+            .apply {
+                puzzle.observe(viewLifecycleOwner) {
+                    val columns =
+                        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                            round(Math.sqrt((9 + 4 * it.size).toDouble()) + 3).toInt() / 2
+                        else
+                            round(Math.sqrt((9 + 4 * it.size).toDouble()) - 3).toInt() / 2
+                    val adapter = TileAdapter(activity, it)
+                    binding.board.numColumns = columns
+                    binding.board.adapter = adapter
+                }
+                duration.observe(viewLifecycleOwner) {
+                    var seconds = round(it.toDouble() / MS_PER_SECOND).toInt()
+                    var minutes = seconds / SECONDS_PER_MINUTE
+                    seconds %= SECONDS_PER_MINUTE
+                    val hours = minutes / MINUTES_PER_HOUR
+                    minutes %= MINUTES_PER_HOUR
+                    val elapsedTime: String = if (hours > 0)
+                        String.format(hmsFormat, hours, minutes, seconds)
+                    else
+                        String.format(msFormat, minutes, seconds)
+                    timer.text = elapsedTime
+                }
+            }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.puzzle_options, menu)
+        timer = menu.findItem(R.id.timer).actionView as TextView
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var handled = true
+        val id = item.itemId
+        if (id == R.id.new_puzzle) {
+            viewModel.newPuzzle()
+        } else {
+            handled = super.onOptionsItemSelected(item)
+        }
+        return handled
+    }
+
+    companion object {
+        const val SECONDS_PER_MINUTE = 60
+        const val MINUTES_PER_HOUR = 60
+        const val MS_PER_SECOND = 1000
+    }
 }
