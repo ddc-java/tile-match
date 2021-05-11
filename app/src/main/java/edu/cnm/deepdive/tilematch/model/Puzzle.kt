@@ -23,23 +23,11 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
     private val selections: MutableList<Int>
 
     init {
-        val pool: MutableList<Int> = IntStream
-            .range(0, imagePoolSize)
-            .boxed()
-            .collect(
-                Collectors.toCollection(
-                    Supplier { ArrayList() })
-            )
+        val pool = MutableList<Int>(imagePoolSize) {it}
         pool.shuffle(rng)
         val rawTiles: MutableList<Tile> = pool
-            .stream()
-            .limit((size / 2).toLong())
-            .flatMap {
-                Stream.of(
-                    Tile(it), Tile(it)
-                )
-            }
-            .collect(Collectors.toCollection { ArrayList() })
+            .subList(0, size / 2)
+            .flatMap {listOf(Tile(it), Tile(it))} as MutableList<Tile>
         rawTiles.shuffle(rng)
         tiles = Collections.unmodifiableList(rawTiles)
         selections = LinkedList()

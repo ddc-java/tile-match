@@ -20,4 +20,6 @@
   <integer name="reveal_time_preference_max">10</integer>
   <integer name="reveal_time_preference_default">5</integer>
 
+  <integer name="size_preference_fallback">10</integer>
+
 </resources>

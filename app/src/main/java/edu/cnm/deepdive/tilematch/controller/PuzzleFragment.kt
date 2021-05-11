@@ -33,9 +33,9 @@ class PuzzleFragment : Fragment() {
 
     private lateinit var binding: FragmentPuzzleBinding
     private lateinit var viewModel: PuzzleViewModel
-    private lateinit var timer: TextView
     private lateinit var hmsFormat: String
     private lateinit var msFormat: String
+    private var timer: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +82,9 @@ class PuzzleFragment : Fragment() {
                         String.format(hmsFormat, hours, minutes, seconds)
                     else
                         String.format(msFormat, minutes, seconds)
-                    timer.text = elapsedTime
+                    timer?.run {
+                        text = elapsedTime
+                    }
                 }
             }
     }

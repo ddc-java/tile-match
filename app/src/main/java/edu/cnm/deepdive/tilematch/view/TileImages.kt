@@ -1,19 +1,15 @@
-package edu.cnm.deepdive.tilematch.view;
+package edu.cnm.deepdive.tilematch.view
 
-import edu.cnm.deepdive.tilematch.R;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import edu.cnm.deepdive.tilematch.R
+import java.util.*
+import java.util.function.Supplier
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
-public class TileImages {
+object TileImages {
 
-  public static List<Integer> RESOURCE_IDS;
-
-  static {
-    RESOURCE_IDS = Collections.unmodifiableList(
-        (List<? extends Integer>) IntStream.of(
+    var RESOURCE_IDS: List<Int> = Collections.unmodifiableList(
+        IntStream.of(
             R.drawable.ic_baby_carriage,
             R.drawable.ic_bicycle,
             R.drawable.ic_camera,
@@ -39,9 +35,11 @@ public class TileImages {
             R.drawable.ic_trash,
             R.drawable.ic_volume
         )
-        .boxed()
-        .collect(Collectors.toCollection(ArrayList::new))
-    );
-  }
+            .boxed()
+            .collect(
+                Collectors.toCollection(
+                    Supplier { ArrayList() })
+            ) as List<Int>
+    )
 
 }
