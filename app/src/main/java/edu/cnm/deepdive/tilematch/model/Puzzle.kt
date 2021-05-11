@@ -2,11 +2,6 @@ package edu.cnm.deepdive.tilematch.model
 
 import java.util.*
 import java.util.function.Consumer
-import java.util.function.Supplier
-import java.util.stream.Collectors
-import java.util.stream.IntStream
-import java.util.stream.Stream
-import kotlin.collections.ArrayList
 
 class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
 
@@ -20,23 +15,28 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
 
     private var selection: Tile? = null
     private var matches = 0
-    private val selections: MutableList<Int>
+
+    private val _selections: MutableList<Int>
+    val selections: List<Int>
+        get() {
+            return Collections.unmodifiableList(_selections);
+        }
 
     init {
-        val pool = MutableList<Int>(imagePoolSize) {it}
+        val pool = MutableList<Int>(imagePoolSize) { it }
         pool.shuffle(rng)
         val rawTiles: MutableList<Tile> = pool
             .subList(0, size / 2)
-            .flatMap {listOf(Tile(it), Tile(it))} as MutableList<Tile>
+            .flatMap { listOf(Tile(it), Tile(it)) } as MutableList<Tile>
         rawTiles.shuffle(rng)
         tiles = Collections.unmodifiableList(rawTiles)
-        selections = LinkedList()
+        _selections = LinkedList()
         state = State.IN_PROGRESS
     }
 
     fun select(position: Int) {
         val tile = tiles[position]
-        selections.add(position)
+        _selections.add(position)
         if (tile.state === Tile.State.HIDDEN) {
             when (state) {
                 State.IN_PROGRESS -> {
@@ -61,7 +61,8 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
                     }
                     selection = null
                 }
-                else -> {}
+                else -> {
+                }
             }
         }
     }
@@ -77,10 +78,6 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
                 })
             state = State.IN_PROGRESS
         }
-    }
-
-    fun getSelections(): List<Int> {
-        return selections
     }
 
     enum class State {
