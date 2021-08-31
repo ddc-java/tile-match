@@ -25,7 +25,7 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
     init {
         val pool = MutableList<Int>(imagePoolSize) { it }
         pool.shuffle(rng)
-        val rawTiles: MutableList<Tile> = pool
+        val rawTiles = pool
             .subList(0, size / 2)
             .flatMap { listOf(Tile(it), Tile(it)) } as MutableList<Tile>
         rawTiles.shuffle(rng)
@@ -70,12 +70,8 @@ class Puzzle(val size: Int, imagePoolSize: Int, rng: Random) {
     fun unreveal() {
         if (state == State.REVEALING_NO_MATCH) {
             tiles
-                .filter {
-                    it.state === Tile.State.SELECTED
-                }
-                .forEach(Consumer {
-                    it.state = Tile.State.HIDDEN
-                })
+                .filter {it.state === Tile.State.SELECTED}
+                .forEach(Consumer {it.state = Tile.State.HIDDEN})
             state = State.IN_PROGRESS
         }
     }
